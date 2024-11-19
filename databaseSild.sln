@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35219.272
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Andmebaas_Vsevolod_Tsarev_TARpv23", "Andmebaas_Vsevolod_Tsarev_TARpv23.csproj", "{E5076603-A878-41B4-BF27-D237F0BA69F6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "databaseSild", "databaseSild.csproj", "{E5076603-A878-41B4-BF27-D237F0BA69F6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

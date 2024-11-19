@@ -107,9 +107,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Pildid\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="Andmed.mdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -118,6 +116,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <DependentUpon>Andmed.mdf</DependentUpon>
     </Content>
+    <Content Include="Pildid\pilt.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

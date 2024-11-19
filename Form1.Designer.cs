@@ -179,9 +179,9 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(585, 19);
+            this.pictureBox1.Location = new System.Drawing.Point(527, 19);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(126, 111);
+            this.pictureBox1.Size = new System.Drawing.Size(184, 152);
             this.pictureBox1.TabIndex = 11;
             this.pictureBox1.TabStop = false;
             // 
@@ -216,7 +216,6 @@
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.toodeBindingSource2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.andmebaasDataSetBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.toodeBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.toodeBindingSource1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
