@@ -242,6 +242,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 Command.Parametrs.AddWithValue(@"Picture", imageBytes);
                 Command.ExecuteNoQuery();
             }*/
+            //git controll
         }
         private void Eemaldamine()
         {
