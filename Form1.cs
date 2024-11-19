@@ -28,18 +28,29 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 using (SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\opilane\source\repos\Andmebaas_Vsevolod_Tsarev_TARpv23\Andmed.mdf;Integrated Security=True"))
                 {
                     conn.Open();
-                    string checkTableQuery = @"
-                        IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Toode') 
-                        BEGIN
-                            CREATE TABLE Toode (
-                                Id INT PRIMARY KEY IDENTITY(1,1),
-                                Nimetus NVARCHAR(100),
-                                Kogus INT,
-                                Hind DECIMAL(18, 2),
-                                Pilt DECIMAL,
-                                ProductPicture VARBINARY(MAX)
-                            );
-                        END";
+                    string createTablesQuery = @"
+                    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Kategooria') 
+                    BEGIN
+                        CREATE TABLE Kategooria (
+                            Id INT PRIMARY KEY IDENTITY(1,1),
+                            Nimetus NVARCHAR(100) NOT NULL
+                        );
+                    END;
+
+                    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Toode') 
+                    BEGIN
+                        CREATE TABLE Toode (
+                            Id INT PRIMARY KEY IDENTITY(1,1),
+                            Nimetus NVARCHAR(100) NOT NULL,
+                            Kogus INT NOT NULL,
+                            Hind DECIMAL(18, 2) NOT NULL,
+                            Pilt NVARCHAR(255),
+                            ProductPicture VARBINARY(MAX),
+                            KategooriaId INT,
+                            FOREIGN KEY (KategooriaId) REFERENCES Kategooria(Id) ON DELETE SET NULL
+                        );
+                    END;
+                    ";
 
                     using (SqlCommand cmd = new SqlCommand(checkTableQuery, conn))
                     {
@@ -173,6 +184,14 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                     cmd = new SqlCommand("DELETE FROM Toode WHERE Id = @id", conn);
                     cmd.Parameters.AddWithValue("@id", ID);
                     cmd.ExecuteNonQuery();
+
+                    conn.Close() ;
+                    string file = dataGridView1.SelectedRows[3].Cells["Pilt"].Value.ToString();
+
+                    System.Threading.Thread.Sleep(500);
+                    KustFail();
+                    Eemaldamine();
+                    NaitaAndmed();
                 }
 
                 KustFail(filename);
