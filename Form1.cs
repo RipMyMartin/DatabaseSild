@@ -9,11 +9,13 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
 {
     public partial class Form1 : Form
     {
-        SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\opilane\source\repos\DatabaseSild\Andmed.mdf;Integrated Security=True");
+        SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Andmed.mdf;Integrated Security=True");
         SqlCommand cmd;
         SqlDataAdapter adapter;
         string extension;
 
+
+        DataTable laoTable;
         public Form1()
         {
             InitializeComponent();
@@ -25,7 +27,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\opilane\source\repos\DatabaseSild\Andmed.mdf;Integrated Security=True"))
+                using (SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Andmed.mdf;Integrated Security=True"))
                 {
                     conn.Open();
                     string createTablesQuery = @"
@@ -33,7 +35,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                     BEGIN
                         CREATE TABLE Ladu (
                             Id INT PRIMARY KEY IDENTITY(1,1),
-                            LaoNimetud VARCHAR(50) NOT NULL,
+                            LaoNimetus VARCHAR(50) NOT NULL,
                             Suurus VARCHAR(50) NOT NULL,
                             Kirjeldus NCHAR(10) NOT NULL
                         );
@@ -118,6 +120,10 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                         extension = ".png";
                     }
 
+                    cmd = new SqlCommand("SELECT ID FROM LADU WHERE LaoNimetus=@ladu", conn);
+                    cmd.Parameters.AddWithValue("@ladu",Ladu_cb.Text);
+                    ID=Convert.ToInt32(cmd.ExecuteScalar());
+
                     conn.Open();
                     cmd = new SqlCommand("INSERT INTO Toode (Nimetus, Kogus, Hind, Pilt) VALUES (@toode, @kogus, @hind, @pilt)", conn);
                     cmd.Parameters.AddWithValue("@toode", Nimetus_txt.Text);
@@ -125,6 +131,9 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                     cmd.Parameters.AddWithValue("@hind", decimal.Parse(Hind_txt.Text));
                     cmd.Parameters.AddWithValue("@pilt", Nimetus_txt.Text + extension);
                     cmd.ExecuteNonQuery();
+
+
+                    cmd.Parameters.AddWithValue("@ladu", ID);
                 }
                 catch (Exception ex)
                 {
@@ -263,6 +272,20 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             Kogus_txt.Text = "";
             Hind_txt.Text = "";
             pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\Pildid"), "pilt.png"));
+        }
+        private void Ladu_cb_Click(object sender, EventArgs e)
+        {
+                        conn.Open();
+            cmd = new SqlCommand("SELECT Id, laoNimetus FROM Ladu", conn);
+            adapter = new SqlDataAdapter();
+            adapter.Fill(laoTable);
+            foreach (DataRow item in laoTable.Rows)
+            {
+                Ladu_cb.Items.Add(item["LaoNimetus"]);
+            }
+
+
+            conn.Close();
         }
     }
 }
