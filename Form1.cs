@@ -9,7 +9,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
 {
     public partial class Form1 : Form
     {
-        SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\opilane\source\repos\Andmebaas_Vsevolod_Tsarev_TARpv23\Andmed.mdf;Integrated Security=True");
+        SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\opilane\source\repos\DatabaseSild\Andmed.mdf;Integrated Security=True");
         SqlCommand cmd;
         SqlDataAdapter adapter;
         string extension;
@@ -25,7 +25,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\opilane\source\repos\Andmebaas_Vsevolod_Tsarev_TARpv23\Andmed.mdf;Integrated Security=True"))
+                using (SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\opilane\source\repos\DatabaseSild\Andmed.mdf;Integrated Security=True"))
                 {
                     conn.Open();
                     string createTablesQuery = @"
@@ -52,7 +52,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                     END;
                     ";
 
-                    using (SqlCommand cmd = new SqlCommand(checkTableQuery, conn))
+                    using (SqlCommand cmd = new SqlCommand(createTablesQuery, conn))
                     {
                         cmd.ExecuteNonQuery();
                     }
@@ -185,15 +185,14 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                     cmd.Parameters.AddWithValue("@id", ID);
                     cmd.ExecuteNonQuery();
 
-                    conn.Close() ;
+                    conn.Close();
                     string file = dataGridView1.SelectedRows[3].Cells["Pilt"].Value.ToString();
 
                     System.Threading.Thread.Sleep(500);
-                    KustFail();
                     Eemaldamine();
+                    KustFail(file);
                     NaitaAndmed();
                 }
-
                 KustFail(filename);
             }
             catch (Exception ex)
