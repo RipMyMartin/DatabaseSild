@@ -29,11 +29,13 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 {
                     conn.Open();
                     string createTablesQuery = @"
-                    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Kategooria') 
+                    IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Ladu') 
                     BEGIN
-                        CREATE TABLE Kategooria (
+                        CREATE TABLE Ladu (
                             Id INT PRIMARY KEY IDENTITY(1,1),
-                            Nimetus NVARCHAR(100) NOT NULL
+                            LaoNimetud VARCHAR(50) NOT NULL,
+                            Suurus VARCHAR(50) NOT NULL,
+                            Kirjeldus NCHAR(10) NOT NULL
                         );
                     END;
 
@@ -44,10 +46,11 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                             Nimetus NVARCHAR(100) NOT NULL,
                             Kogus INT NOT NULL,
                             Hind DECIMAL(18, 2) NOT NULL,
-                            Pilt NVARCHAR(255),
+                            Pilt NVARCHAR(MAX),
                             ProductPicture VARBINARY(MAX),
-                            KategooriaId INT,
-                            FOREIGN KEY (KategooriaId) REFERENCES Kategooria(Id) ON DELETE SET NULL
+                            LaoId INT NULL,
+                            CONSTRAINT FK_Toode_Ladu FOREIGN KEY (LaoId) REFERENCES Ladu (Id)
+                            
                         );
                     END;
                     ";
@@ -253,14 +256,6 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                     pictureBox1.Image = Image.FromFile(save.FileName);
                 }
             }
-            /*
-            if (OpenFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                byte[] imageBytes = File.ReadAllBytes(OpenFileDialog.FileName);
-                Command.Parametrs.AddWithValue(@"Picture", imageBytes);
-                Command.ExecuteNoQuery();
-            }*/
-            //git controll
         }
         private void Eemaldamine()
         {
