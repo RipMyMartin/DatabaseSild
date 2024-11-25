@@ -47,8 +47,8 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.toodeBindingSource3 = new System.Windows.Forms.BindingSource(this.components);
             this.toodeBindingSource4 = new System.Windows.Forms.BindingSource(this.components);
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.Ladu_cb = new System.Windows.Forms.Label();
+            this.Ladu_cb = new System.Windows.Forms.ComboBox();
+            this.Label_4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.toodeBindingSource2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.andmebaasDataSetBindingSource)).BeginInit();
@@ -197,31 +197,33 @@
             this.toodeBindingSource4.DataMember = "Toode";
             this.toodeBindingSource4.DataSource = this.andmebaasDataSetBindingSource;
             // 
-            // comboBox1
-            // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(122, 146);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(100, 21);
-            this.comboBox1.TabIndex = 12;
-            // 
             // Ladu_cb
             // 
-            this.Ladu_cb.AutoSize = true;
-            this.Ladu_cb.Location = new System.Drawing.Point(61, 149);
+            this.Ladu_cb.AccessibleName = "Ladu_cb";
+            this.Ladu_cb.FormattingEnabled = true;
+            this.Ladu_cb.Location = new System.Drawing.Point(122, 146);
             this.Ladu_cb.Name = "Ladu_cb";
-            this.Ladu_cb.Size = new System.Drawing.Size(31, 13);
-            this.Ladu_cb.TabIndex = 13;
-            this.Ladu_cb.Text = "Ladu";
-            this.Ladu_cb.Click += new System.EventHandler(this.Ladu_cb_Click);
+            this.Ladu_cb.Size = new System.Drawing.Size(100, 21);
+            this.Ladu_cb.TabIndex = 12;
+            this.Ladu_cb.SelectedIndexChanged += new System.EventHandler(this.Ladu_cb_Click);
+            // 
+            // Label_4
+            // 
+            this.Label_4.AutoSize = true;
+            this.Label_4.Location = new System.Drawing.Point(61, 149);
+            this.Label_4.Name = "Label_4";
+            this.Label_4.Size = new System.Drawing.Size(31, 13);
+            this.Label_4.TabIndex = 13;
+            this.Label_4.Text = "Ladu";
+            this.Label_4.Click += new System.EventHandler(this.Ladu_cb_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.Label_4);
             this.Controls.Add(this.Ladu_cb);
-            this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.otsipilt_btn);
             this.Controls.Add(this.Uuenda_btn);
@@ -268,8 +270,8 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.BindingSource toodeBindingSource3;
         private System.Windows.Forms.BindingSource toodeBindingSource4;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.Label Ladu_cb;
+        private System.Windows.Forms.ComboBox Ladu_cb;
+        private System.Windows.Forms.Label Label_4;
     }
 }
 

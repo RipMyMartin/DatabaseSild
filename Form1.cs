@@ -29,7 +29,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             {
                 using (SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Andmed.mdf;Integrated Security=True"))
                 {
-                    conn.Open();
+                    conn.Open(); 
                     string createTablesQuery = @"
                     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Ladu') 
                     BEGIN
@@ -39,6 +39,14 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                             Suurus VARCHAR(50) NOT NULL,
                             Kirjeldus NCHAR(10) NOT NULL
                         );
+
+                        INSERT INTO Ladu (LaoNimetus, Suurus, Kirjeldus)
+                        VALUES
+                            ('Suur', '5', 'POLE'),
+                            ('Keskmine', '3', 'POLE'),
+                            ('Väike', '1', 'POLE');
+
+
                     END;
 
                     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Toode') 
@@ -120,8 +128,8 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                         extension = ".png";
                     }
 
-                    cmd = new SqlCommand("SELECT ID FROM LADU WHERE LaoNimetus=@ladu", conn);
-                    cmd.Parameters.AddWithValue("@ladu",Ladu_cb.Text);
+                    cmd = new SqlCommand("SELECT ID FROM Ladu WHERE LaoNimetus=@Ladu", conn);
+                    cmd.Parameters.AddWithValue("@ladu",Label_4.Text);
                     ID=Convert.ToInt32(cmd.ExecuteScalar());
 
                     conn.Open();
@@ -133,7 +141,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                     cmd.ExecuteNonQuery();
 
 
-                    cmd.Parameters.AddWithValue("@ladu", ID);
+                    cmd.Parameters.AddWithValue("@Ladu", ID);
                 }
                 catch (Exception ex)
                 {
@@ -275,10 +283,12 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
         }
         private void Ladu_cb_Click(object sender, EventArgs e)
         {
-                        conn.Open();
-            cmd = new SqlCommand("SELECT Id, laoNimetus FROM Ladu", conn);
+            conn.Open();
+            cmd = new SqlCommand("SELECT Id, LaoNimetus FROM Ladu", conn);
             adapter = new SqlDataAdapter();
             adapter.Fill(laoTable);
+
+
             foreach (DataRow item in laoTable.Rows)
             {
                 Ladu_cb.Items.Add(item["LaoNimetus"]);
