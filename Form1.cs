@@ -13,13 +13,13 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
         SqlCommand cmd;
         SqlDataAdapter adapter;
         string extension;
+        DataTable laotable;
 
-
-        DataTable laoTable;
         public Form1()
         {
             InitializeComponent();
             CreateDatabaseAndTable();
+            LaduNaitamine();
             NaitaAndmed();
         }
 
@@ -29,7 +29,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             {
                 using (SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Andmed.mdf;Integrated Security=True"))
                 {
-                    conn.Open(); 
+                    conn.Open();
                     string createTablesQuery = @"
                     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Ladu') 
                     BEGIN
@@ -45,8 +45,6 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                             ('Suur', '5', 'POLE'),
                             ('Keskmine', '3', 'POLE'),
                             ('Väike', '1', 'POLE');
-
-
                     END;
 
                     IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Toode') 
@@ -60,7 +58,6 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                             ProductPicture VARBINARY(MAX),
                             LaoId INT NULL,
                             CONSTRAINT FK_Toode_Ladu FOREIGN KEY (LaoId) REFERENCES Ladu (Id)
-                            
                         );
                     END;
                     ";
@@ -75,6 +72,13 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             {
                 MessageBox.Show("Ошибка при создании базы данных или таблицы: " + ex.Message);
             }
+        }
+        private void Eemaldamine()
+        {
+            Nimetus_txt.Text = "";
+            Kogus_txt.Text = "";
+            Hind_txt.Text = "";
+            pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\Pildid"), "pilt.png"));
         }
 
         public void NaitaAndmed()
@@ -119,44 +123,34 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
 
         private void Lisa_btn_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(Nimetus_txt.Text) && !string.IsNullOrWhiteSpace(Kogus_txt.Text) && !string.IsNullOrWhiteSpace(Hind_txt.Text))
+            if (Nimetus_txt.Text.Trim() != string.Empty && Kogus_txt.Text.Trim() != string.Empty && Hind_txt.Text.Trim() != string.Empty)
             {
                 try
                 {
-                    if (string.IsNullOrEmpty(extension))
-                    {
-                        extension = ".png";
-                    }
-
-                    cmd = new SqlCommand("SELECT ID FROM Ladu WHERE LaoNimetus=@Ladu", conn);
-                    cmd.Parameters.AddWithValue("@ladu",Label_4.Text);
-                    ID=Convert.ToInt32(cmd.ExecuteScalar());
-
                     conn.Open();
-                    cmd = new SqlCommand("INSERT INTO Toode (Nimetus, Kogus, Hind, Pilt) VALUES (@toode, @kogus, @hind, @pilt)", conn);
+                    cmd = new SqlCommand("SELECT Id FROM Ladu WHERE LaoNimetus=@ladu", conn);
+                    cmd.Parameters.AddWithValue("@ladu", Ladu_cb.Text);
+                    ID = Convert.ToInt32(cmd.ExecuteScalar());
+
+                    cmd = new SqlCommand("Insert into Toode(Nimetus, Kogus, Hind, Pilt, LaoID) Values (@toode, @kogus, @hind, @pilt, @laoid)", conn);
                     cmd.Parameters.AddWithValue("@toode", Nimetus_txt.Text);
-                    cmd.Parameters.AddWithValue("@kogus", int.Parse(Kogus_txt.Text));
-                    cmd.Parameters.AddWithValue("@hind", decimal.Parse(Hind_txt.Text));
+                    cmd.Parameters.AddWithValue("@kogus", Kogus_txt.Text);
+                    cmd.Parameters.AddWithValue("@hind", Hind_txt.Text);
                     cmd.Parameters.AddWithValue("@pilt", Nimetus_txt.Text + extension);
+                    cmd.Parameters.AddWithValue("@laoid", ID);
+
                     cmd.ExecuteNonQuery();
-
-
-                    cmd.Parameters.AddWithValue("@Ladu", ID);
+                    conn.Close();
+                    NaitaAndmed();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Ошибка при добавлении данных: " + ex.Message);
-                }
-                finally
-                {
-                    conn.Close();
-                    Eemaldamine();
-                    NaitaAndmed();
+                    MessageBox.Show("Ошибка при добавлении товара: " + ex.Message);
                 }
             }
             else
             {
-                MessageBox.Show("Заполните все поля!");
+                MessageBox.Show("Пожалуйста, заполните все поля!");
             }
         }
 
@@ -187,7 +181,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             }
             else
             {
-                MessageBox.Show("Заполните все поля!");
+                MessageBox.Show("Пожалуйста, заполните все поля!");
             }
         }
 
@@ -204,10 +198,9 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                     cmd = new SqlCommand("DELETE FROM Toode WHERE Id = @id", conn);
                     cmd.Parameters.AddWithValue("@id", ID);
                     cmd.ExecuteNonQuery();
-
                     conn.Close();
-                    string file = dataGridView1.SelectedRows[3].Cells["Pilt"].Value.ToString();
 
+                    string file = dataGridView1.SelectedRows[3].Cells["Pilt"].Value.ToString();
                     System.Threading.Thread.Sleep(500);
                     Eemaldamine();
                     KustFail(file);
@@ -232,15 +225,15 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             try
             {
                 string filePath = Path.Combine(Path.GetFullPath(@"..\..\Pildid"), file + extension);
-                MessageBox.Show($"Püüan kustutada faili {filePath}");
+                MessageBox.Show($"Пытаюсь удалить файл {filePath}");
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
-                    MessageBox.Show("Fail on kustutatud");
+                    MessageBox.Show("Файл удален");
                 }
                 else
                 {
-                    MessageBox.Show($"Fail {file} ei leitud");
+                    MessageBox.Show($"Файл {file} не найден");
                 }
             }
             catch (Exception ex)
@@ -274,28 +267,30 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 }
             }
         }
-        private void Eemaldamine()
-        {
-            Nimetus_txt.Text = "";
-            Kogus_txt.Text = "";
-            Hind_txt.Text = "";
-            pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\Pildid"), "pilt.png"));
-        }
-        private void Ladu_cb_Click(object sender, EventArgs e)
-        {
-            conn.Open();
-            cmd = new SqlCommand("SELECT Id, LaoNimetus FROM Ladu", conn);
-            adapter = new SqlDataAdapter();
-            adapter.Fill(laoTable);
 
-
-            foreach (DataRow item in laoTable.Rows)
+        private void LaduNaitamine()
+        {
+            try
             {
-                Ladu_cb.Items.Add(item["LaoNimetus"]);
+                conn.Open();
+                string query = "SELECT * FROM Ladu";
+                SqlDataAdapter da = new SqlDataAdapter(query, conn);
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                Ladu_cb.DisplayMember = "LaoNimetus";
+                Ladu_cb.ValueMember = "Id";
+                Ladu_cb.DataSource = dt;
             }
-
-
-            conn.Close();
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка при отображении складов: " + ex.Message);
+            }
+            finally
+            {
+                conn.Close();
+            }
         }
     }
 }
+
+

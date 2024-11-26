@@ -205,17 +205,15 @@
             this.Ladu_cb.Name = "Ladu_cb";
             this.Ladu_cb.Size = new System.Drawing.Size(100, 21);
             this.Ladu_cb.TabIndex = 12;
-            this.Ladu_cb.SelectedIndexChanged += new System.EventHandler(this.Ladu_cb_Click);
             // 
             // Label_4
             // 
             this.Label_4.AutoSize = true;
-            this.Label_4.Location = new System.Drawing.Point(61, 149);
+            this.Label_4.Location = new System.Drawing.Point(71, 149);
             this.Label_4.Name = "Label_4";
             this.Label_4.Size = new System.Drawing.Size(31, 13);
             this.Label_4.TabIndex = 13;
             this.Label_4.Text = "Ladu";
-            this.Label_4.Click += new System.EventHandler(this.Ladu_cb_Click);
             // 
             // Form1
             // 
