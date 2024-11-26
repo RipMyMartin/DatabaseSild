@@ -14,6 +14,9 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
         SqlDataAdapter adapter;
         string extension;
         DataTable laotable;
+        DataTable dt;
+        string openFilePath; // Путь к выбранному файлу изображения
+        int ID;
 
         public Form1()
         {
@@ -76,72 +79,111 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
 
         private void Eemaldamine()
         {
-            Nimetus_txt.Text = "";
-            Kogus_txt.Text = "";
-            Hind_txt.Text = "";
-            pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\Pildid"), "pilt.png"));
+            Nimetus_txt.Clear();
+            Kogus_txt.Clear();
+            Hind_txt.Clear();
+            pictureBox1.Image = null;
         }
 
-        public void NaitaAndmed()
+        private void NaitaAndmed()
         {
             try
             {
                 conn.Open();
-                DataTable dt = new DataTable();
-                cmd = new SqlCommand("SELECT * FROM Toode", conn);
-                adapter = new SqlDataAdapter(cmd);
+                adapter = new SqlDataAdapter("SELECT * FROM Toode", conn);
+                dt = new DataTable();
                 adapter.Fill(dt);
                 dataGridView1.DataSource = dt;
-                MessageBox.Show("Данные успешно загружены.");
+
+                // Настраиваем DataGridView
+                dataGridView1.Columns["Id"].Visible = false;
+                dataGridView1.Columns["Pilt"].HeaderText = "Изображение";
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при отображении данных: " + ex.Message);
+                MessageBox.Show("Ошибка при загрузке данных: " + ex.Message);
             }
             finally
             {
                 conn.Close();
             }
         }
-
-        int ID = 0;
-
-        private void dataGridView1_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        private void ClearPictureBoxImage()
         {
-            ID = (int)dataGridView1.Rows[e.RowIndex].Cells["Id"].Value;
-            Nimetus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Nimetus"].Value.ToString();
-            Kogus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Kogus"].Value.ToString();
-            Hind_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Hind"].Value.ToString();
-            try
+            if (pictureBox1.Image != null)
             {
-                pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\Pildid"), dataGridView1.Rows[e.RowIndex].Cells["Pilt"].Value.ToString()));
-            }
-            catch
-            {
-                pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\Pildid"), "pilt.png"));
-                pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+                pictureBox1.Image.Dispose();
+                pictureBox1.Image = null;
             }
         }
 
+        private void dataGridView1_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            try
+            {
+                ID = (int)dataGridView1.Rows[e.RowIndex].Cells["Id"].Value;
+                Nimetus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Nimetus"].Value.ToString();
+                Kogus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Kogus"].Value.ToString();
+                Hind_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Hind"].Value.ToString();
+
+                string imageName = dataGridView1.Rows[e.RowIndex].Cells["Pilt"].Value.ToString();
+                string imagePath = Path.Combine(Path.GetFullPath(@"..\..\Pildid"), imageName);
+
+                if (File.Exists(imagePath))
+                {
+                    pictureBox1.Image = Image.FromFile(imagePath);
+                    pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+                }
+                else
+                {
+                    pictureBox1.Image = Image.FromFile(Path.Combine(Path.GetFullPath(@"..\..\Pildid"), "pilt.png"));
+                    pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Ошибка при отображении изображения: " + ex.Message);
+            }
+        }
+
+
+
         private void Lisa_btn_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(Nimetus_txt.Text) && !string.IsNullOrWhiteSpace(Kogus_txt.Text) && !string.IsNullOrWhiteSpace(Hind_txt.Text))
+            if (!string.IsNullOrWhiteSpace(Nimetus_txt.Text) &&
+                !string.IsNullOrWhiteSpace(Kogus_txt.Text) &&
+                !string.IsNullOrWhiteSpace(Hind_txt.Text))
             {
                 try
                 {
+                    if (pictureBox1.Image == null)
+                    {
+                        MessageBox.Show("Пожалуйста, выберите изображение!");
+                        return;
+                    }
+
                     conn.Open();
+
                     cmd = new SqlCommand("SELECT Id FROM Ladu WHERE LaoNimetus=@ladu", conn);
                     cmd.Parameters.AddWithValue("@ladu", Ladu_cb.Text);
-                    ID = Convert.ToInt32(cmd.ExecuteScalar());
+                    int laduId = Convert.ToInt32(cmd.ExecuteScalar());
 
-                    cmd = new SqlCommand("Insert into Toode(Nimetus, Kogus, Hind, Pilt, LaoId) Values (@toode, @kogus, @hind, @pilt, @laoid)", conn);
+                    string imageName = $"{Nimetus_txt.Text}{extension}";
+                    cmd = new SqlCommand("INSERT INTO Toode (Nimetus, Kogus, Hind, Pilt, LaoId) VALUES (@toode, @kogus, @hind, @pilt, @laoid)", conn);
                     cmd.Parameters.AddWithValue("@toode", Nimetus_txt.Text);
-                    cmd.Parameters.AddWithValue("@kogus", Kogus_txt.Text);
-                    cmd.Parameters.AddWithValue("@hind", Hind_txt.Text);
-                    cmd.Parameters.AddWithValue("@pilt", Nimetus_txt.Text + extension);
-                    cmd.Parameters.AddWithValue("@laoid", ID);
-
+                    cmd.Parameters.AddWithValue("@kogus", int.Parse(Kogus_txt.Text));
+                    cmd.Parameters.AddWithValue("@hind", decimal.Parse(Hind_txt.Text));
+                    cmd.Parameters.AddWithValue("@pilt", imageName);
+                    cmd.Parameters.AddWithValue("@laoid", laduId);
                     cmd.ExecuteNonQuery();
+
+                    string destinationPath = Path.Combine(Path.GetFullPath(@"..\..\Pildid"), imageName);
+                    if (!File.Exists(destinationPath))
+                    {
+                        File.Copy(openFilePath, destinationPath, true);
+                    }
+
+                    MessageBox.Show("Товар успешно добавлен!");
                 }
                 catch (Exception ex)
                 {
@@ -167,22 +209,22 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 try
                 {
                     conn.Open();
-                    cmd = new SqlCommand("UPDATE Toode SET Nimetus = @toode, Kogus = @kogus, Hind = @hind WHERE Id = @id", conn);
+                    cmd = new SqlCommand("UPDATE Toode SET Nimetus = @toode, Kogus = @kogus, Hind = @hind, Pilt = @pilt WHERE Id = @id", conn);
                     cmd.Parameters.AddWithValue("@id", ID);
                     cmd.Parameters.AddWithValue("@toode", Nimetus_txt.Text);
                     cmd.Parameters.AddWithValue("@kogus", int.Parse(Kogus_txt.Text));
                     cmd.Parameters.AddWithValue("@hind", decimal.Parse(Hind_txt.Text));
+                    cmd.Parameters.AddWithValue("@pilt", Nimetus_txt.Text + extension);  
+
                     cmd.ExecuteNonQuery();
+                    conn.Close();
+
+                    Eemaldamine();
+                    NaitaAndmed();
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Ошибка при обновлении данных: " + ex.Message);
-                }
-                finally
-                {
-                    conn.Close();
-                    Eemaldamine();
-                    NaitaAndmed();
                 }
             }
             else
@@ -190,6 +232,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 MessageBox.Show("Пожалуйста, заполните все поля!");
             }
         }
+
 
         private void kustuta_btn_Click(object sender, EventArgs e)
         {
@@ -204,8 +247,10 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                     cmd = new SqlCommand("DELETE FROM Toode WHERE Id = @id", conn);
                     cmd.Parameters.AddWithValue("@id", ID);
                     cmd.ExecuteNonQuery();
+                    conn.Close();
+
+                    KustFail(filename);
                 }
-                KustFail(filename);
             }
             catch (Exception ex)
             {
@@ -218,6 +263,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 NaitaAndmed();
             }
         }
+
 
         private void KustFail(string file)
         {
@@ -236,6 +282,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             }
         }
 
+
         private void otsipilt_btn_Click(object sender, EventArgs e)
         {
             OpenFileDialog open = new OpenFileDialog
@@ -247,20 +294,14 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
 
             if (open.ShowDialog() == DialogResult.OK)
             {
-                extension = Path.GetExtension(open.FileName);
-                SaveFileDialog save = new SaveFileDialog
-                {
-                    InitialDirectory = Path.GetFullPath(@"..\..\Pildid"),
-                    FileName = Nimetus_txt.Text + extension
-                };
-
-                if (save.ShowDialog() == DialogResult.OK)
-                {
-                    File.Copy(open.FileName, save.FileName, true);
-                    pictureBox1.Image = Image.FromFile(save.FileName);
-                }
+                openFilePath = open.FileName;
+                extension = Path.GetExtension(openFilePath);
+                pictureBox1.Image = Image.FromFile(openFilePath);
+                pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             }
         }
+
+
 
         public void LaduNaitamine()
         {
