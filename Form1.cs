@@ -72,7 +72,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при создании базы данных или таблицы: " + ex.Message);
+                MessageBox.Show("Viga andmebaasi või tabeli loomisel: " + ex.Message);
             }
         }
 
@@ -99,7 +99,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при загрузке данных: " + ex.Message);
+                MessageBox.Show("Viga andmete laadimisel: " + ex.Message);
             }
             finally
             {
@@ -123,7 +123,6 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 Kogus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Kogus"].Value.ToString();
                 Hind_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Hind"].Value.ToString();
 
-                // Загружаем изображение из базы данных
                 byte[] imageBytes = (byte[])dataGridView1.Rows[e.RowIndex].Cells["ProductPicture"].Value;
 
                 if (imageBytes != null && imageBytes.Length > 0)
@@ -142,12 +141,9 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при отображении изображения: " + ex.Message);
+                MessageBox.Show("Viga pildi kuvamisel: " + ex.Message);
             }
         }
-
-
-
 
         private void Lisa_btn_Click(object sender, EventArgs e)
         {
@@ -159,7 +155,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 {
                     if (pictureBox1.Image == null)
                     {
-                        MessageBox.Show("Пожалуйста, выберите изображение!");
+                        MessageBox.Show("Palun valige pilt!");
                         return;
                     }
 
@@ -184,11 +180,11 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                     cmd.Parameters.AddWithValue("@laoid", laduId);
                     cmd.ExecuteNonQuery();
 
-                    MessageBox.Show("Товар успешно добавлен!");
+                    MessageBox.Show("Toode lisati edukalt!");
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Ошибка при добавлении товара: " + ex.Message);
+                    MessageBox.Show("Viga toote lisamisel: " + ex.Message);
                 }
                 finally
                 {
@@ -199,7 +195,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             }
             else
             {
-                MessageBox.Show("Пожалуйста, заполните все поля!");
+                MessageBox.Show("Palun täitke kõik väljad!");
             }
         }
 
@@ -211,7 +207,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 try
                 {
                     conn.Open();
-                    string newImageName = Nimetus_txt.Text + extension;  // Обновленное имя файла
+                    string newImageName = Nimetus_txt.Text + extension; 
                     cmd = new SqlCommand("UPDATE Toode SET Nimetus = @toode, Kogus = @kogus, Hind = @hind, Pilt = @pilt WHERE Id = @id", conn);
                     cmd.Parameters.AddWithValue("@id", ID);
                     cmd.Parameters.AddWithValue("@toode", Nimetus_txt.Text);
@@ -231,11 +227,11 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                     pictureBox1.Image = Image.FromFile(destinationPath);
                     pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
 
-                    MessageBox.Show("Данные успешно обновлены!");
+                    MessageBox.Show("Andmed on edukalt uuendatud!");
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Ошибка при обновлении данных: " + ex.Message);
+                    MessageBox.Show("Viga andmete uuendamisel: " + ex.Message);
                 }
                 finally
                 {
@@ -245,7 +241,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             }
             else
             {
-                MessageBox.Show("Пожалуйста, заполните все поля!");
+                MessageBox.Show("Palun täitke kõik väljad!");
             }
         }
 
@@ -271,7 +267,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при удалении: " + ex.Message);
+                MessageBox.Show("Viga kustutamisel: " + ex.Message);
             }
             finally
             {
@@ -290,12 +286,12 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
-                    MessageBox.Show("Файл удален");
+                    MessageBox.Show("Fail on kustutatud");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при удалении файла: " + ex.Message);
+                MessageBox.Show("Viga faili kustutamisel: " + ex.Message);
             }
         }
 
@@ -336,7 +332,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при загрузке складов: " + ex.Message);
+                MessageBox.Show("Viga laode andmete laadimisel: " + ex.Message);
             }
             finally
             {
