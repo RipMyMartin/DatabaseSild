@@ -9,7 +9,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
 {
     public partial class Form1 : Form
     {
-        SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Andmed.mdf;Integrated Security=True");
+        SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\opilane\source\repos\DatabaseSild\Andmed.mdf;Integrated Security=True");
         SqlCommand cmd;
         SqlDataAdapter adapter;
         string extension;
@@ -27,7 +27,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Andmed.mdf;Integrated Security=True"))
+                using (SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\opilane\source\repos\DatabaseSild\Andmed.mdf;Integrated Security=True"))
                 {
                     conn.Open();
                     string createTablesQuery = @"
@@ -73,6 +73,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 MessageBox.Show("Ошибка при создании базы данных или таблицы: " + ex.Message);
             }
         }
+
         private void Eemaldamine()
         {
             Nimetus_txt.Text = "";
@@ -91,6 +92,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 adapter = new SqlDataAdapter(cmd);
                 adapter.Fill(dt);
                 dataGridView1.DataSource = dt;
+                MessageBox.Show("Данные успешно загружены.");
             }
             catch (Exception ex)
             {
@@ -123,7 +125,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
 
         private void Lisa_btn_Click(object sender, EventArgs e)
         {
-            if (Nimetus_txt.Text.Trim() != string.Empty && Kogus_txt.Text.Trim() != string.Empty && Hind_txt.Text.Trim() != string.Empty)
+            if (!string.IsNullOrWhiteSpace(Nimetus_txt.Text) && !string.IsNullOrWhiteSpace(Kogus_txt.Text) && !string.IsNullOrWhiteSpace(Hind_txt.Text))
             {
                 try
                 {
@@ -132,7 +134,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                     cmd.Parameters.AddWithValue("@ladu", Ladu_cb.Text);
                     ID = Convert.ToInt32(cmd.ExecuteScalar());
 
-                    cmd = new SqlCommand("Insert into Toode(Nimetus, Kogus, Hind, Pilt, LaoID) Values (@toode, @kogus, @hind, @pilt, @laoid)", conn);
+                    cmd = new SqlCommand("Insert into Toode(Nimetus, Kogus, Hind, Pilt, LaoId) Values (@toode, @kogus, @hind, @pilt, @laoid)", conn);
                     cmd.Parameters.AddWithValue("@toode", Nimetus_txt.Text);
                     cmd.Parameters.AddWithValue("@kogus", Kogus_txt.Text);
                     cmd.Parameters.AddWithValue("@hind", Hind_txt.Text);
@@ -140,12 +142,16 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                     cmd.Parameters.AddWithValue("@laoid", ID);
 
                     cmd.ExecuteNonQuery();
-                    conn.Close();
-                    NaitaAndmed();
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show("Ошибка при добавлении товара: " + ex.Message);
+                }
+                finally
+                {
+                    conn.Close();
+                    Eemaldamine();
+                    NaitaAndmed();
                 }
             }
             else
@@ -198,13 +204,6 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                     cmd = new SqlCommand("DELETE FROM Toode WHERE Id = @id", conn);
                     cmd.Parameters.AddWithValue("@id", ID);
                     cmd.ExecuteNonQuery();
-                    conn.Close();
-
-                    string file = dataGridView1.SelectedRows[3].Cells["Pilt"].Value.ToString();
-                    System.Threading.Thread.Sleep(500);
-                    Eemaldamine();
-                    KustFail(file);
-                    NaitaAndmed();
                 }
                 KustFail(filename);
             }
@@ -225,15 +224,10 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             try
             {
                 string filePath = Path.Combine(Path.GetFullPath(@"..\..\Pildid"), file + extension);
-                MessageBox.Show($"Пытаюсь удалить файл {filePath}");
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
                     MessageBox.Show("Файл удален");
-                }
-                else
-                {
-                    MessageBox.Show($"Файл {file} не найден");
                 }
             }
             catch (Exception ex)
@@ -253,7 +247,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
 
             if (open.ShowDialog() == DialogResult.OK)
             {
-                string extension = Path.GetExtension(open.FileName);
+                extension = Path.GetExtension(open.FileName);
                 SaveFileDialog save = new SaveFileDialog
                 {
                     InitialDirectory = Path.GetFullPath(@"..\..\Pildid"),
@@ -268,22 +262,23 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             }
         }
 
-        private void LaduNaitamine()
+        public void LaduNaitamine()
         {
             try
             {
                 conn.Open();
-                string query = "SELECT * FROM Ladu";
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                Ladu_cb.DisplayMember = "LaoNimetus";
-                Ladu_cb.ValueMember = "Id";
-                Ladu_cb.DataSource = dt;
+                laotable = new DataTable();
+                cmd = new SqlCommand("SELECT * FROM Ladu", conn);
+                adapter = new SqlDataAdapter(cmd);
+                adapter.Fill(laotable);
+                foreach (DataRow row in laotable.Rows)
+                {
+                    Ladu_cb.Items.Add(row["LaoNimetus"]);
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка при отображении складов: " + ex.Message);
+                MessageBox.Show("Ошибка при загрузке складов: " + ex.Message);
             }
             finally
             {
@@ -292,5 +287,3 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
         }
     }
 }
-
-
