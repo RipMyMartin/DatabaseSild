@@ -116,6 +116,8 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
         }
         private void dataGridView1_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
+
+            //git controll
             try
             {
                 ID = (int)dataGridView1.Rows[e.RowIndex].Cells["Id"].Value;
