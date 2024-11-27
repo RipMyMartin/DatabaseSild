@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Andmebaas_Vsevolod_Tsarev_TARpv23
+namespace databaseSild
 {
     internal static class Program
     {

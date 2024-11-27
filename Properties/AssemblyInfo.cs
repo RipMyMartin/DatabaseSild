@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Andmebaas_Vsevolod_Tsarev_TARpv23")]
+[assembly: AssemblyTitle("databaseSild")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("TTHK")]
-[assembly: AssemblyProduct("Andmebaas_Vsevolod_Tsarev_TARpv23")]
+[assembly: AssemblyProduct("databaseSild")]
 [assembly: AssemblyCopyright("Copyright © TTHK 2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

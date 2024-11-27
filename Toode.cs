@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Andmebaas_Vsevolod_Tsarev_TARpv23
+namespace databaseSild
 {
     public class Toode
     {

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Andmebaas_Vsevolod_Tsarev_TARpv23.Properties {
+namespace databaseSild.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

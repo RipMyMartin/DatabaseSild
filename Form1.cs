@@ -5,14 +5,13 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
-namespace Andmebaas_Vsevolod_Tsarev_TARpv23
+namespace databaseSild
 {
     public partial class Form1 : Form
     {
-        SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\opilane\source\repos\DatabaseSild\Andmed.mdf;Integrated Security=True");
+        SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\ripmy\source\repos\DatabaseSild\Andmed.mdf;Integrated Security=True");
         SqlCommand cmd;
         SqlDataAdapter adapter;
-        string extension;
         DataTable laotable, dt;
         string openFilePath;
         int ID;
@@ -24,12 +23,35 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             LaduNaitamine();
             NaitaAndmed();
         }
+        public void LaduNaitamine()
+        {
+            try
+            {
+                conn.Open();
+                laotable = new DataTable();
+                cmd = new SqlCommand("SELECT * FROM Ladu", conn);
+                adapter = new SqlDataAdapter(cmd);
+                adapter.Fill(laotable);
+                foreach (DataRow row in laotable.Rows)
+                {
+                    Ladu_cb.Items.Add(row["LaoNimetus"]);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Viga laode andmete laadimisel: " + ex.Message);
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
 
         public void CreateDatabaseAndTable()
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\opilane\source\repos\DatabaseSild\Andmed.mdf;Integrated Security=True"))
+                using (SqlConnection conn = new SqlConnection(@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=C:\Users\ripmy\source\repos\DatabaseSild\Andmed.mdf;Integrated Security=True"))
                 {
                     conn.Open();
                     string createTablesQuery = @"
@@ -76,12 +98,21 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             }
         }
 
+        private void ClearPictureBoxImage()
+        {
+            if (pictureBox1.Image != null)
+            {
+                pictureBox1.Image.Dispose();
+                pictureBox1.Image = null;
+            }
+        }
+
         private void Eemaldamine()
         {
             Nimetus_txt.Clear();
             Kogus_txt.Clear();
             Hind_txt.Clear();
-            pictureBox1.Image = null;
+            ClearPictureBoxImage();
         }
 
         private void NaitaAndmed()
@@ -106,18 +137,9 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 conn.Close();
             }
         }
-        private void ClearPictureBoxImage()
-        {
-            if (pictureBox1.Image != null)
-            {
-                pictureBox1.Image.Dispose();
-                pictureBox1.Image = null;
-            }
-        }
+
         private void dataGridView1_RowHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-
-            //git controll
             try
             {
                 ID = (int)dataGridView1.Rows[e.RowIndex].Cells["Id"].Value;
@@ -125,8 +147,9 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 Kogus_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Kogus"].Value.ToString();
                 Hind_txt.Text = dataGridView1.Rows[e.RowIndex].Cells["Hind"].Value.ToString();
 
-                byte[] imageBytes = (byte[])dataGridView1.Rows[e.RowIndex].Cells["ProductPicture"].Value;
+                byte[] imageBytes = dataGridView1.Rows[e.RowIndex].Cells["ProductPicture"].Value as byte[];
 
+                ClearPictureBoxImage();
                 if (imageBytes != null && imageBytes.Length > 0)
                 {
                     using (MemoryStream ms = new MemoryStream(imageBytes))
@@ -201,7 +224,6 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             }
         }
 
-
         private void Uuenda_btn_Click(object sender, EventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(Nimetus_txt.Text) && !string.IsNullOrWhiteSpace(Kogus_txt.Text) && !string.IsNullOrWhiteSpace(Hind_txt.Text))
@@ -209,25 +231,22 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 try
                 {
                     conn.Open();
-                    string newImageName = Nimetus_txt.Text + extension; 
-                    cmd = new SqlCommand("UPDATE Toode SET Nimetus = @toode, Kogus = @kogus, Hind = @hind, Pilt = @pilt WHERE Id = @id", conn);
+
+                    byte[] imageBytes;
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        pictureBox1.Image.Save(ms, pictureBox1.Image.RawFormat);
+                        imageBytes = ms.ToArray();
+                    }
+
+                    cmd = new SqlCommand("UPDATE Toode SET Nimetus = @toode, Kogus = @kogus, Hind = @hind, ProductPicture = @pilt WHERE Id = @id", conn);
                     cmd.Parameters.AddWithValue("@id", ID);
                     cmd.Parameters.AddWithValue("@toode", Nimetus_txt.Text);
                     cmd.Parameters.AddWithValue("@kogus", int.Parse(Kogus_txt.Text));
                     cmd.Parameters.AddWithValue("@hind", decimal.Parse(Hind_txt.Text));
-                    cmd.Parameters.AddWithValue("@pilt", newImageName);
+                    cmd.Parameters.AddWithValue("@pilt", imageBytes);
 
                     cmd.ExecuteNonQuery();
-                    conn.Close();
-
-                    string destinationPath = Path.Combine(Path.GetFullPath(@"..\..\Pildid"), newImageName);
-                    if (!File.Exists(destinationPath))
-                    {
-                        File.Copy(openFilePath, destinationPath, true);
-                    }
-
-                    pictureBox1.Image = Image.FromFile(destinationPath);
-                    pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
 
                     MessageBox.Show("Andmed on edukalt uuendatud!");
                 }
@@ -237,6 +256,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                 }
                 finally
                 {
+                    conn.Close();
                     NaitaAndmed();
                     Eemaldamine();
                 }
@@ -247,14 +267,11 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             }
         }
 
-
-
         private void kustuta_btn_Click(object sender, EventArgs e)
         {
             try
             {
                 ID = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells["Id"].Value);
-                string filename = dataGridView1.SelectedRows[0].Cells["Pilt"].Value.ToString();
 
                 if (ID != 0)
                 {
@@ -263,8 +280,6 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
                     cmd.Parameters.AddWithValue("@id", ID);
                     cmd.ExecuteNonQuery();
                     conn.Close();
-
-                    KustFail(filename);
                 }
             }
             catch (Exception ex)
@@ -279,66 +294,20 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23
             }
         }
 
-
-        private void KustFail(string file)
-        {
-            try
-            {
-                string filePath = Path.Combine(Path.GetFullPath(@"..\..\Pildid"), file + extension);
-                if (File.Exists(filePath))
-                {
-                    File.Delete(filePath);
-                    MessageBox.Show("Fail on kustutatud");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Viga faili kustutamisel: " + ex.Message);
-            }
-        }
-
-
         private void otsipilt_btn_Click(object sender, EventArgs e)
         {
             OpenFileDialog open = new OpenFileDialog
             {
-                InitialDirectory = @"C:\Users\opilane\Pictures\",
-                Multiselect = false,
-                Filter = "Image Files(*.jpeg; *.png; *.bmp; *.jpg)|*.jpeg; *.png; *.bmp; *.jpg"
+                Filter = "Image Files (*.bmp; *.jpg; *.png)|*.bmp;*.jpg;*.png",
+                Title = "Valige pilt"
             };
 
             if (open.ShowDialog() == DialogResult.OK)
             {
-                openFilePath = open.FileName;
-                extension = Path.GetExtension(openFilePath);
-                pictureBox1.Image = Image.FromFile(openFilePath);
+                ClearPictureBoxImage();
+                pictureBox1.Image = Image.FromFile(open.FileName);
                 pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-            }
-        }
-
-
-
-        public void LaduNaitamine()
-        {
-            try
-            {
-                conn.Open();
-                laotable = new DataTable();
-                cmd = new SqlCommand("SELECT * FROM Ladu", conn);
-                adapter = new SqlDataAdapter(cmd);
-                adapter.Fill(laotable);
-                foreach (DataRow row in laotable.Rows)
-                {
-                    Ladu_cb.Items.Add(row["LaoNimetus"]);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Viga laode andmete laadimisel: " + ex.Message);
-            }
-            finally
-            {
-                conn.Close();
+                openFilePath = open.FileName;
             }
         }
     }

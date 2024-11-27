@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Andmebaas_Vsevolod_Tsarev_TARpv23.Properties
+namespace databaseSild.Properties
 {
 
 
@@ -44,7 +44,7 @@ namespace Andmebaas_Vsevolod_Tsarev_TARpv23.Properties
             {
                 if ((resourceMan == null))
                 {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Andmebaas_Vsevolod_Tsarev_TARpv23.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("databaseSild.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

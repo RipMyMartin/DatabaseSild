@@ -1,4 +1,4 @@
-﻿namespace Andmebaas_Vsevolod_Tsarev_TARpv23
+﻿namespace databaseSild
 {
     partial class Form1
     {
